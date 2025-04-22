@@ -1,5 +1,5 @@
 """
-Contains the code for the `Game` class, which holds the game's data.
+Contains the code for the `Game` class, which holds the game's data and is used to save and load the game.
 """
 
 class Game:
