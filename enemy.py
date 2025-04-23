@@ -11,7 +11,7 @@ class Enemy(pygame.sprite.Sprite):
         
         # Stuff to draw the sprite to the screen
 
-        self.surf = pygame.surface.Surface((25,25))
+        self.surf = pygame.image.load("./art/base zombie.png")
         self.surf.fill((255,23,23))
         self.rect = self.surf.get_rect()
 
@@ -37,8 +37,18 @@ class Enemy(pygame.sprite.Sprite):
             self.kill()
 
     def attack(self) -> None:
+        """
+        A function to register an attack on the total lives remaining.
+
+        :return: Returns Nothing
+        """
         pass
 
     def get_pos(self) -> tuple[int, int]:
-        pass
+        return self.pos
     
+    def draw(self, window: pygame.display.Surface) -> None:
+        window.blit(self.surf, self.rect)
+
+    def damage(self, amount: int) -> None:
+        self.hp -= amount
