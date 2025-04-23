@@ -2,12 +2,12 @@
 Contains the functions used to save and load the data of the game.
 """
 
+# File and code by Isaac.
+
 import pickle
 from game import Game
 
-
-
-def save(game_obj) -> None: 
+def save(game_obj: Game) -> None: 
     """
     Saves the instance of the `Game` class to a .pk1 file in order to easily deserialize object date.
 
@@ -32,18 +32,20 @@ def load_data() -> Game:
         print("File not found, creating new object instance.")
         return Game()
 
-def setup(instance) -> None:
+def setup(instance: Game) -> None:
     """
     After data is loaded, setup the game. Load images, set numbers, etc.
 
     :param instance: The instance of the `Game` class in use.
     :return: Returns nothing.
     """
+    pass
+
 
 def main():
     data = load_data()
     setup()
-    save
+    save()
 
 if __name__ == "__main__":
     main()
