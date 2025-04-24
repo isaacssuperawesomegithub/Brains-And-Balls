@@ -15,13 +15,35 @@ MAP2 = "MAP2"
 MAP3 = "MAP3"
 state = MENU
 
+import pygame
+
 def draw_menu():
-    screen.fill((30, 30, 30))
+    screen.fill((0, 0, 0))
+
+    # background images
+    zombie_hand = pygame.image.load(r"C:\Users\gci.232222\OneDrive - geneseeisd.org\pygame\Brains and Balls\Brains-And-Balls\art\zombie-hand.png").convert_alpha()
+    soccer_ball = pygame.image.load(r"C:\Users\gci.232222\OneDrive - geneseeisd.org\pygame\Brains and Balls\Brains-And-Balls\art\soccer-ball.png").convert_alpha()
+    vs = pygame.image.load(r"C:\Users\gci.232222\OneDrive - geneseeisd.org\pygame\Brains and Balls\Brains-And-Balls\art\VS.png").convert_alpha()
+
+    # size
+    zombie_hand = pygame.transform.scale(zombie_hand, (500, 500))
+    soccer_ball = pygame.transform.scale(soccer_ball, (300, 300))
+    vs = pygame.transform.scale(vs, (300, 300))
+
+    # Draw both images
+    screen.blit(zombie_hand, (1, 10))   
+    screen.blit(soccer_ball, (600, 100))  
+    screen.blit(vs, (250, 100)) 
+
+    # Draw title and play button
     title = font.render("Brains n Balls", True, (255, 255, 255))
     play_button = font.render("START", True, (0, 255, 0))
     screen.blit(title, (290, 100))
     screen.blit(play_button, (350, 250))
+
     return pygame.Rect(350, 250, play_button.get_width(), play_button.get_height())
+
+
 
 def draw_map():
     screen.fill((30, 30, 30))
@@ -57,7 +79,7 @@ while running:
     elif state == MAPS:
         map_rect = draw_map()
         if mouse_click and map_rect.collidepoint(mouse_pos):
-            state = MAP1
+            state = MAP1 
 
     elif state == MAP1:
         screen.fill((0, 100, 0))
