@@ -2,7 +2,7 @@ import pygame
 import sys
 
 pygame.init()
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((2560, 1920))
 pygame.display.set_caption("Tower Defense Game")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Times New Roman", 40)
@@ -26,20 +26,24 @@ def draw_menu():
     vs = pygame.image.load(r"C:\Users\gci.232222\OneDrive - geneseeisd.org\pygame\Brains and Balls\Brains-And-Balls\art\VS.png").convert_alpha()
 
     # size
-    zombie_hand = pygame.transform.scale(zombie_hand, (500, 500))
-    soccer_ball = pygame.transform.scale(soccer_ball, (300, 300))
+    zombie_hand = pygame.transform.scale(zombie_hand, (700, 700))
+    soccer_ball = pygame.transform.scale(soccer_ball, (700, 700))
     vs = pygame.transform.scale(vs, (300, 300))
 
     # Draw both images
-    screen.blit(zombie_hand, (1, 10))   
-    screen.blit(soccer_ball, (600, 100))  
-    screen.blit(vs, (250, 100)) 
+    screen.blit(zombie_hand, (1500, 800))   
+    screen.blit(soccer_ball, (500, 750))
+    screen.blit(vs, (1100, 870)) 
 
     # Draw title and play button
+    font = pygame.font.Font(None, 250)  #font size
     title = font.render("Brains n Balls", True, (255, 255, 255))
     play_button = font.render("START", True, (0, 255, 0))
-    screen.blit(title, (290, 100))
-    screen.blit(play_button, (350, 250))
+    screen.blit(title, (585, 300))
+    screen.blit(play_button, (980, 600))
+
+
+
 
     return pygame.Rect(350, 250, play_button.get_width(), play_button.get_height())
 

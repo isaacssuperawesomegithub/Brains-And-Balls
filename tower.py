@@ -1,12 +1,15 @@
 import pygame
 from utils import *
+from enemy import Enemy
+from projectile import Projectile
 
 class Tower:
-    def __init__(self, x: int, y: int, size: int, range: int):
+    def __init__(self, x: int, y: int, size: int, range: int, damage: int):
         self.x = x
         self.y = y
         self.size = size
         self.range = range
+        self.damage = damage
 
 
     # returns x, y location
@@ -38,3 +41,25 @@ class Tower:
     # draws a circle at the location
     def draw(self) -> None:
         pygame.draw.circle(get_window(), (10, 200, 80), (self.x, self.y), self.size)
+
+    def get_closest_enemy(self, players: list[Enemy]) -> Enemy:
+        closest = None
+        for player in players:
+            x = self.get_distance_from(player.get_pos())
+            if closest == None:
+                closest = player
+            if closest > x:
+                closest = player
+
+    def attack(self, player: list[Enemy] | Enemy) -> None:
+        
+        if isinstance(player, list):   
+            closest = self.get_closest_enemy(player)            
+        else:
+            closest = player
+
+        if get_distance(player.get_pos(), self.get_pos()) <= self.range:
+            self.fire_at(closest)
+
+    def fire_at(self, target: Enemy):
+        return Projectile(target, 5)
