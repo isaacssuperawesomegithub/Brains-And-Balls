@@ -44,10 +44,10 @@ class Enemy(pygame.sprite.Sprite):
         """
         pass
 
-    def get_pos(self) -> tuple[int, int]:
+    def get_pos(self) -> pygame.math.Vector2:
         return self.pos
     
-    def draw(self, window: pygame.display.Surface) -> None:
+    def draw(self, window: pygame.surface.Surface) -> None:
         window.blit(self.surf, self.rect)
 
     def damage(self, amount: int) -> None:
