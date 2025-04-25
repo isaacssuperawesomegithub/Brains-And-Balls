@@ -96,19 +96,28 @@ while running:
         rect1, rect2, rect3 = draw_map()
         if mouse_click:
             if rect1.collidepoint(mouse_pos):
-                state = MAP1
+                state = MAP1  # Switch to Map 1 when selected
             elif rect2.collidepoint(mouse_pos):
                 state = MAP2
             elif rect3.collidepoint(mouse_pos):
                 state = MAP3
 
     elif state == MAP1:
-        screen.fill((0, 100, 0))
+        # Here you load the content specific to Map 1
+        screen.fill((0, 100, 0))  # Green background to represent Map 1
         text = font.render("MAP 1 START", True, (0, 255, 0))
         screen.blit(text, (300, 280))
 
+        # You could load more detailed content for Map 1 here
+        # For example, display enemies, towers, or different background elements
+
+        # Example: Show a simple message or map image
+        # map1_image = pygame.image.load("path/to/map1.png")
+        # map1_image = pygame.transform.scale(map1_image, (screen_width, screen_height))
+        # screen.blit(map1_image, (0, 0))
+
     elif state == MAP2:
-        screen.fill((0, 200, 0))
+        screen.fill((0, 200, 0))  # Different shade for Map 2
         text = font.render("MAP 2 START", True, (0, 255, 0))
         screen.blit(text, (300, 280))
 
