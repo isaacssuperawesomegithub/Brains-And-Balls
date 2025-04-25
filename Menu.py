@@ -4,7 +4,9 @@ import sys
 pygame.init()
 info = pygame.display.Info()
 screen_width, screen_height = info.current_w, info.current_h
-screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
+
+# Setting the display mode to windowed fullscreen 
+screen = pygame.display.set_mode((screen_width, screen_height), pygame.NOFRAME)
 pygame.display.set_caption("Tower Defense Game")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Times New Roman", 40)
