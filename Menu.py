@@ -17,7 +17,9 @@ MAPS = "MAP"
 MAP1 = "MAP1"
 MAP2 = "MAP2"
 MAP3 = "MAP3"
-state = MENU
+PAUSE = "PAUSE"
+TOWER_SELECTION = "TOWER_SELECTION"
+state = MENU  
 
 # Load and scale images once
 zombie_hand_img = pygame.image.load("art/zombie-hand.png").convert_alpha()
@@ -73,6 +75,10 @@ def draw_map():
 
     return rect1, rect2, rect3
 
+def draw_pause_button():
+    pause_button = font.render("Pause", True, (255, 255, 255))
+    screen.blit(pause_button, (700, 10))
+    return pygame.Rect(700, 10, pause_button.get_width(), pause_button.get_height())
 
 # Main loop
 running = True
@@ -102,21 +108,78 @@ while running:
             elif rect3.collidepoint(mouse_pos):
                 state = MAP3
 
+    # Map 1
     elif state == MAP1:
-        screen.fill((0, 100, 0))
+        screen.fill((0, 0, 200))
         text = font.render("MAP 1 START", True, (0, 255, 0))
         screen.blit(text, (300, 280))
 
+        # Draw the pause button
+        pause_rect = draw_pause_button()
+
+        # Handle pause click (only if it's not the first frame of entering the map)
+        if mouse_click and not just_entered_map and pause_rect.collidepoint(mouse_pos):
+            previous_state = state  # Save the current state before pausing
+            state = PAUSE
+
+        # Reset the flag after first frame
+        just_entered_map = False
+
+        
+    # Map 2
     elif state == MAP2:
-        screen.fill((0, 200, 0))
+        screen.fill((0, 100, 0))
         text = font.render("MAP 2 START", True, (0, 255, 0))
         screen.blit(text, (300, 280))
 
+        # Draw the pause button
+        pause_rect = draw_pause_button()
+
+        # Handle pause click (only if it's not the first frame of entering the map)
+        if mouse_click and not just_entered_map and pause_rect.collidepoint(mouse_pos):
+            previous_state = state  # Save the current state before pausing
+            state = PAUSE
+
+        # Reset the flag after first frame
+        just_entered_map = False
+
+    # Map 3
     elif state == MAP3:
-        screen.fill((0, 255, 0))  # Fixed invalid RGB
-        text = font.render("MAP 3 START", True, (0, 255, 0))
+        screen.fill((0, 250, 0))
+        text = font.render("MAP 3 START", True, (0, 0, 0))
         screen.blit(text, (300, 280))
 
+        # Draw the pause button
+        pause_rect = draw_pause_button()
+
+        # Handle pause click (only if it's not the first frame of entering the map)
+        if mouse_click and not just_entered_map and pause_rect.collidepoint(mouse_pos):
+            previous_state = state  # Save the current state before pausing
+            state = PAUSE
+
+        # Reset the flag after first frame
+        just_entered_map = False
+
+    # Pause screen
+    elif state == PAUSE:
+        screen.fill((20, 20, 20))
+        text = font.render("PAUSED", True, (0, 250, 0))
+        screen.blit(text, (300, 100))
+        
+        # Draw resume button
+        resume_button = font.render("Resume", True, (0, 255, 0))
+        screen.blit(resume_button, (350, 300))
+        resume_rect = pygame.Rect(350, 300, resume_button.get_width(), resume_button.get_height())
+
+        # Draw Quit button
+        quit_button = font.render("Quit", True, (0, 255, 0))
+        screen.blit(quit_button, (350, 200))
+        quit_rect = pygame.Rect(350, 200, quit_button.get_width(), quit_button.get_height())
+
+        if mouse_click and resume_rect.collidepoint(mouse_pos):
+            state = previous_state  # Return to the previous state when "Resume" is clicked
+        elif mouse_click and quit_rect.collidepoint(mouse_pos):
+            state = MENU
     pygame.display.flip()
     clock.tick(60)
 
