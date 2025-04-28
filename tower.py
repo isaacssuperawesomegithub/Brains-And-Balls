@@ -3,63 +3,104 @@ from utils import *
 from enemy import Enemy
 from projectile import Projectile
 
-class Tower:
-    def __init__(self, x: int, y: int, size: int, range: int, damage: int):
-        self.x = x
-        self.y = y
+class Tower(pygame.sprite.Sprite):
+    def __init__(self, pos: pygame.Vector2, size: int, range: int, damage: int):
+        super().__init__()
+        
+        self.pos = pos
+        
+        self.image = pygame.image.load("./art/icecream-zombie.png")
+        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.rect = self.image.get_rect()
+
+        self.rect.center = self.pos
+
         self.size = size
         self.range = range
         self.damage = damage
 
 
-    # returns x, y location
-    def get_pos(self) -> tuple[int, int]:
-        return self.x, self.y
+    def get_pos(self) -> pygame.Vector2:
+        """
+        Gets the position of the tower.
+
+        :return: Returns a coordinate of the tower's position.
+        """
+
+        return self.pos
     
     
-    # returns size (radius)
     def get_size(self) -> int:
+        """
+        Gets the size (radius) of the tower.
+
+        :return: Returns an int representing the radius of the tower's size.
+        """
+
         return self.size
     
 
-    # returns range
     def get_range(self) -> int:
+        """
+        Gets the range (radius) of the tower.
+
+        :return: Returns an int representing the radius of the tower's range.
+        """
+
         return self.range
     
 
-    # returns distance from pos
-    def get_distance_from(self, pos):
-        x, y = pos
-        return ((abs(self.x - x) ** 2) + (abs(self.y - y) ** 2)) ** .5
+    def get_distance_from(self, pos: pygame.Vector2) -> float:
+        """
+        Gets the distance from a specified point.
+
+        :param pos: Coordinate to get distance from.
+        :return: Returns a float representing the distance from the tower to the point.
+        """
+
+        return get_distance(pos, self.get_pos())
 
 
-    # returns whether a point is within the tower's range
-    def within_range(self, pos):
+    def within_range(self, pos: pygame.Vector2) -> bool:
+        """
+        Checks if a point is within the tower's range.
+
+        :param pos: Position to check if within range.
+        :return: Returns a boolean, True if point is within range.
+        """
+
         return self.get_distance_from(pos) <= self.range
 
 
-    # draws a circle at the location
-    def draw(self) -> None:
-        pygame.draw.circle(get_window(), (10, 200, 80), (self.x, self.y), self.size)
-
     def get_closest_enemy(self, players: list[Enemy]) -> Enemy:
+        """
+        Gets the enemy closest to the tower.
+
+        :param players: List of enemies to get closest from.
+        :return: Returns the closest enemy.
+        """
+
         closest = None
         for player in players:
             x = self.get_distance_from(player.get_pos())
-            if closest == None:
+            if closest == None or closest > x:
                 closest = player
-            if closest > x:
-                closest = player
+
 
     def attack(self, player: list[Enemy] | Enemy) -> None:
-        
-        if isinstance(player, list):   
-            closest = self.get_closest_enemy(player)            
-        else:
-            closest = player
+        """
+        Calls `Fire_at` on the specified enemy or closest enemy within a list.
 
-        if get_distance(player.get_pos(), self.get_pos()) <= self.range:
-            self.fire_at(closest)
+        :param player: Enemy of list of enemys to fire at.
+        :return: Returns nothing.
+        """
+
+        if isinstance(player, list):   
+            player = self.get_closest_enemy(player)            
+
+        if self.get_distance_from(player.get_pos()) <= self.range:
+            self.fire_at(player)
+
 
     def fire_at(self, target: Enemy):
         return Projectile(target, 5)
