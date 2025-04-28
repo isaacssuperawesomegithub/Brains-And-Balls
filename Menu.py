@@ -80,6 +80,21 @@ def draw_pause_button():
     screen.blit(pause_button, (700, 10))
     return pygame.Rect(700, 10, pause_button.get_width(), pause_button.get_height())
 
+
+def draw_basictower_button():
+    # Load the Basic Tower image if not already loaded (like you've done for other images)
+    button_image = pygame.image.load("art/basic_tower.png").convert_alpha()  # Replace with your image path
+    button_image = pygame.transform.scale(button_image, (100, 100))  # Resize it as needed
+
+    # Define the rectangle for the button and position it
+    button_rect = button_image.get_rect(center=(screen_width // 2, screen_height // 2))
+
+    # Draw the button on the screen
+    screen.blit(button_image, button_rect)
+
+    return button_rect  # Return the rect so you can check for clicks
+
+
 # Main loop
 running = True
 while running:
@@ -102,7 +117,7 @@ while running:
         rect1, rect2, rect3 = draw_map()
         if mouse_click:
             if rect1.collidepoint(mouse_pos):
-                state = MAP1  # Switch to Map 1 when selected
+                state = MAP1
             elif rect2.collidepoint(mouse_pos):
                 state = MAP2
             elif rect3.collidepoint(mouse_pos):
@@ -110,29 +125,16 @@ while running:
 
     # Map 1
     elif state == MAP1:
-<<<<<<< HEAD
-        # Here you load the content specific to Map 1
-        screen.fill((0, 100, 0))  # Green background to represent Map 1
-        text = font.render("MAP 1 START", True, (0, 255, 0))
-        screen.blit(text, (300, 280))
-
-        # You could load more detailed content for Map 1 here
-        # For example, display enemies, towers, or different background elements
-
-        # Example: Show a simple message or map image
-        # map1_image = pygame.image.load("path/to/map1.png")
-        # map1_image = pygame.transform.scale(map1_image, (screen_width, screen_height))
-        # screen.blit(map1_image, (0, 0))
-
-    elif state == MAP2:
-        screen.fill((0, 200, 0))  # Different shade for Map 2
-=======
         screen.fill((0, 0, 200))
         text = font.render("MAP 1 START", True, (0, 255, 0))
         screen.blit(text, (300, 280))
 
         # Draw the pause button
         pause_rect = draw_pause_button()
+
+
+        #Draw Basic Tower Select Button 
+        BasicTower_rect = draw_basictower_button()
 
         # Handle pause click (only if it's not the first frame of entering the map)
         if mouse_click and not just_entered_map and pause_rect.collidepoint(mouse_pos):
@@ -146,7 +148,6 @@ while running:
     # Map 2
     elif state == MAP2:
         screen.fill((0, 100, 0))
->>>>>>> 96028e648fb0c551bf495e158d04353e393c5e25
         text = font.render("MAP 2 START", True, (0, 255, 0))
         screen.blit(text, (300, 280))
 
