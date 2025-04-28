@@ -52,3 +52,35 @@ def get_distance(first_pos: pygame.math.Vector2 | list[float, float], second_pos
     # Calculates the hypotenuse of this triangle
     dist = hypot(dx, dy)
     return dist
+
+
+def get_distance_from_line(line_start: pygame.Vector2, line_end: pygame.Vector2, point: pygame.Vector2) -> float:
+    """
+    Gets the shortest distance of a point from a line.
+
+    :param line_start: Position of start of line.
+    :param line_end: Position of end of line.
+    :point: Position of point.
+    :return: Returns the distance as a float.
+    """
+    
+    x1, y1 = line_start
+    x2, y2 = line_end
+    x3, y3 = point
+
+    dx = x2 - x1
+    dy = y2 - y1
+
+    if dx == dy == 0: # line is a single point
+        return hypot(x3 - x1, y3 - y1)
+    
+    # how far along the line the point is 
+    t = ((x3 - x1) * dx + (y3 - y1) * dy) / (dx ** 2 + dy ** 2)
+
+    # clamp t from 0 to 1
+    t = max(0, min(1, t))
+
+    closest_x = x1 + t * dx
+    closest_y = y1 + t * dy
+
+    return hypot(x3 - closest_x, y3 - closest_y)
