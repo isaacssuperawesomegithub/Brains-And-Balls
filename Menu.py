@@ -1,5 +1,6 @@
 import pygame
 import sys
+import time
 
 # Initialize Pygame
 pygame.init()
@@ -12,8 +13,8 @@ pygame.display.set_caption("Tower Defense Game")
 clock = pygame.time.Clock()
 
 # Fonts
-menu_font = pygame.font.SysFont("Times New Roman", 40)
-map_font = pygame.font.SysFont("Arial", 36)
+menu_font = pygame.font.SysFont("Comic Sans MS", 100)
+map_font = pygame.font.SysFont("Comic Sans MS", 36)
 
 # Game States
 MENU = "MENU"
@@ -22,9 +23,12 @@ MAP1 = "MAP1"
 MAP2 = "MAP2"
 MAP3 = "MAP3"
 PAUSE = "PAUSE"
+COUNTDOWN = "COUNTDOWN"  # New state for countdown
+WAVE = "WAVE"  # New state for wave
 state = MENU
 previous_state = None
 just_entered_map = True
+start_clicked = False
 
 # Load Images
 zombie_hand_img = pygame.image.load("art/zombie-hand.png").convert_alpha()
@@ -41,6 +45,11 @@ background_map1 = pygame.transform.scale(background_map1, (screen_width, screen_
 # Functions
 def draw_menu():
     screen.fill((0, 0, 0))
+
+    # Draw "Brains and Balls" at the top
+    title_text = menu_font.render("Brains and Balls", True, (255, 255, 255))
+    screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 30))
+
     # Draw hand, ball, vs
     screen.blit(zombie_hand_img, (screen_width // 4 - zombie_hand_img.get_width() // 2, screen_height // 2 - zombie_hand_img.get_height() // 2))
     screen.blit(soccer_ball_img, (3 * screen_width // 4 - soccer_ball_img.get_width() // 2, screen_height // 2 - soccer_ball_img.get_height() // 2))
@@ -78,8 +87,13 @@ def draw_pause_button():
     screen.blit(pause_text, pause_rect)
     return pause_rect
 
+def draw_wave(wave_number):
+    wave_text = map_font.render(f"Wave {wave_number}", True, (255, 255, 255))
+    screen.blit(wave_text, (screen_width // 2 - wave_text.get_width() // 2, 30))  # Display wave at top
+
 # Main Loop
 running = True
+
 while running:
     mouse_click = False
     mouse_pos = pygame.mouse.get_pos()
@@ -110,7 +124,12 @@ while running:
 
     elif state == MAP1:
         screen.blit(background_map1, (0, 0))
-        map1_label = map_font.render("MAP 1 START", True, (255, 255, 255))
+        map1_label = map_font.render("START 0/1", True, (255, 255, 255))
+        
+        # Update label text based on click
+        if start_clicked:
+            map1_label = map_font.render("START 1/1", True, (255, 255, 255))
+
         screen.blit(map1_label, (screen_width // 2 - map1_label.get_width() // 2, 30))
 
         pause_rect = draw_pause_button()
@@ -119,32 +138,53 @@ while running:
             previous_state = state
             state = PAUSE
 
-        just_entered_map = False
-
-    elif state == MAP2:
-        screen.fill((100, 0, 0))
-        map2_label = map_font.render("MAP 2 START", True, (255, 255, 255))
-        screen.blit(map2_label, (screen_width // 2 - map2_label.get_width() // 2, screen_height // 2))
-
-        pause_rect = draw_pause_button()
-        if mouse_click and not just_entered_map and pause_rect.collidepoint(mouse_pos):
-            previous_state = state
-            state = PAUSE
+        # Detect click on START label
+        if mouse_click and not start_clicked:
+            if (screen_width // 2 - map1_label.get_width() // 2 <= mouse_pos[0] <= screen_width // 2 + map1_label.get_width() // 2) and (30 <= mouse_pos[1] <= 30 + map1_label.get_height()):
+                start_clicked = True
+                state = COUNTDOWN  # Start countdown when "START 1/1" is clicked
 
         just_entered_map = False
 
-    elif state == MAP3:
-        screen.fill((0, 100, 0))
-        map3_label = map_font.render("MAP 3 START", True, (255, 255, 255))
-        screen.blit(map3_label, (screen_width // 2 - map3_label.get_width() // 2, screen_height // 2))
+    elif state == COUNTDOWN:
+        # Display the map background
+        screen.blit(background_map1, (0, 0))
 
-        pause_rect = draw_pause_button()
-        if mouse_click and not just_entered_map and pause_rect.collidepoint(mouse_pos):
-            previous_state = state
-            state = PAUSE
+        # Countdown from 3
+        countdown_text_3 = menu_font.render("3", True, (255, 255, 255))
+        countdown_rect_3 = countdown_text_3.get_rect(center=(screen_width // 2, 50))  # Position at top center
+        screen.blit(countdown_text_3, countdown_rect_3)
+        pygame.display.flip()
+        pygame.time.wait(1000)  # Wait for 1 second
 
-        just_entered_map = False
+        # Display number 2
+        countdown_text_2 = menu_font.render("2", True, (255, 255, 255))
+        countdown_rect_2 = countdown_text_2.get_rect(center=(screen_width // 2, 50))  # Position at top center
+        screen.blit(countdown_text_2, countdown_rect_2)
+        pygame.display.flip()
+        pygame.time.wait(1000)  # Wait for 1 second
 
+        # Display number 1
+        countdown_text_1 = menu_font.render("1", True, (255, 255, 255))
+        countdown_rect_1 = countdown_text_1.get_rect(center=(screen_width // 2, 50))  # Position at top center
+        screen.blit(countdown_text_1, countdown_rect_1)
+        pygame.display.flip()
+        pygame.time.wait(1000)  # Wait for 1 second
+
+        # After countdown finishes, show Wave 1
+        draw_wave(1)
+        pygame.display.flip()
+        pygame.time.wait(1000)  # Wait for a second before transitioning to wave
+
+        state = WAVE  # Once countdown is finished, move to wave display
+
+    elif state == WAVE:
+        # Keep the background visible
+        screen.blit(background_map1, (0, 0))
+
+        # Draw Wave 1 text
+        draw_wave(1)
+    
     elif state == PAUSE:
         screen.fill((20, 20, 20))
         paused_label = menu_font.render("PAUSED", True, (0, 255, 0))
@@ -163,7 +203,9 @@ while running:
             if resume_rect.collidepoint(mouse_pos):
                 state = previous_state
             elif quit_rect.collidepoint(mouse_pos):
-                state = MENU
+                # Reset start to "START 0/1" when quitting
+                start_clicked = False
+                state = MENU  # Go back to the main menu
 
     pygame.display.flip()
     clock.tick(60)
