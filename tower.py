@@ -4,7 +4,7 @@ from enemy import Enemy
 from projectile import Projectile
 
 class Tower(pygame.sprite.Sprite):
-    def __init__(self, pos: pygame.Vector2, size: int, range: int, damage: int):
+    def __init__(self, pos: pygame.Vector2, size: int, range: int, damage: int, atk_speed: float):
         super().__init__()
         
         self.pos = pos
@@ -18,6 +18,11 @@ class Tower(pygame.sprite.Sprite):
         self.size = size
         self.range = range
         self.damage = damage
+
+        self.atk_cd = 0
+        self.atk_speed = atk_speed
+
+        self.projectiles = pygame.sprite.Group()
 
 
     def get_pos(self) -> pygame.Vector2:
@@ -98,9 +103,19 @@ class Tower(pygame.sprite.Sprite):
         if isinstance(player, list):   
             player = self.get_closest_enemy(player)            
 
-        if self.get_distance_from(player.get_pos()) <= self.range:
-            self.fire_at(player)
+        if self.get_distance_from(player.get_pos()) <= self.range and self.atk_cd <= 0:
+            self.projectiles.add(self.fire_at(player))
+            self.atk_cd = 60 * self.atk_speed
+        else:
+            self.atk_cd -= 1
 
 
-    def fire_at(self, target: Enemy):
-        return Projectile(target, 5)
+    def fire_at(self, target: Enemy) -> Projectile:
+        """
+        Creates a projectile with a target and damage.
+
+        :param target: Enemy the projectile is targeting.
+        :return: Returns the projectile.
+        """
+
+        return Projectile(target, 5, pygame.Vector2(self.get_pos()))
