@@ -55,6 +55,26 @@ class Tower(pygame.sprite.Sprite):
         return self.range
     
 
+    def get_damage(self) -> int:
+        """
+        Gets the damage of the tower.
+
+        :return: Returns an int representing the tower's damage.
+        """
+
+        return self.damage
+    
+
+    def get_atk_speed(self) -> float:
+        """
+        Gets the attack speed of the tower.
+
+        :return: Returns a float representing the tower's attack speed.
+        """
+
+        return self.atk_speed
+
+
     def get_distance_from(self, pos: pygame.Vector2) -> float:
         """
         Gets the distance from a specified point.
@@ -77,7 +97,7 @@ class Tower(pygame.sprite.Sprite):
         return self.get_distance_from(pos) <= self.range
 
 
-    def get_closest_enemy(self, players: list[Enemy]) -> Enemy:
+    def get_closest_enemy(self, enemies: list[Enemy]) -> Enemy:
         """
         Gets the enemy closest to the tower.
 
@@ -86,10 +106,12 @@ class Tower(pygame.sprite.Sprite):
         """
 
         closest = None
-        for player in players:
-            x = self.get_distance_from(player.get_pos())
-            if closest == None or closest > x:
-                closest = player
+        for enemy in enemies:
+            x = self.get_distance_from(enemy.get_pos())
+            if closest == None or x < self.get_distance_from(closest.get_pos()):
+                closest = enemy
+
+        return closest
 
 
     def attack(self, player: list[Enemy] | Enemy) -> None:
@@ -101,9 +123,10 @@ class Tower(pygame.sprite.Sprite):
         """
 
         if isinstance(player, list):   
-            player = self.get_closest_enemy(player)            
+            player = self.get_closest_enemy(player)         
 
-        if self.get_distance_from(player.get_pos()) <= self.range and self.atk_cd <= 0:
+
+        if player is not None and self.get_distance_from(player.get_pos()) <= self.range and self.atk_cd <= 0:
             self.projectiles.add(self.fire_at(player))
             self.atk_cd = 60 * self.atk_speed
         else:
@@ -118,4 +141,4 @@ class Tower(pygame.sprite.Sprite):
         :return: Returns the projectile.
         """
 
-        return Projectile(target, 5, pygame.Vector2(self.get_pos()))
+        return Projectile(target, self.get_damage(), pygame.Vector2(self.get_pos()))

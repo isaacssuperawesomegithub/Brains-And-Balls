@@ -41,8 +41,8 @@ class Projectile(pygame.sprite.Sprite):
             dy /= dist
 
         # Moves along the hypotenuse
-        self.pos.x += dx * 10
-        self.pos.y += dy * 10
+        self.pos.x += dx * 7
+        self.pos.y += dy * 7
 
         self.rect.center = self.pos
 

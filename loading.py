@@ -32,19 +32,9 @@ def load_data() -> Game:
         print("File not found, creating new object instance.")
         return Game()
 
-def setup(instance: Game) -> None:
-    """
-    After data is loaded, setup the game. Load images, set numbers, etc.
-
-    :param instance: The instance of the `Game` class in use.
-    :return: Returns nothing.
-    """
-    pass
-
 
 def main():
     data = load_data()
-    setup()
     save()
 
 if __name__ == "__main__":

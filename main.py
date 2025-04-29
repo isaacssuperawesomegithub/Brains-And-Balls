@@ -7,17 +7,42 @@ from pygame.locals import *
 
 from loading import *
 from game import Game
+from enemy import Enemy
+from tower import Tower
+from map import Map
+from utils import *
 
-import pickle
+window = pygame.display.set_mode((600, 400))
 
-window = pygame.display.set_mode((800, 400))
+map = Map(0)
+
+enemy = Enemy((-50, 210), 2)
+
+tower = Tower(pygame.Vector2(160, 140), 14, 100, 1, .3)
+
+
+def main():
+    map.draw_sprites()
+    map.update()
+    map.place_tower(tower)
+    for event in events:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            map.add_enemy(Enemy((-50, 210), 2))
+
+
+
+clock = pygame.time.Clock()
 running = True
-
-game_inst = load_data()
 
 # Main loop
 while running:
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == QUIT:
-            save(game_inst)
             quit()
+    
+    window.fill((0, 0, 0))
+    main()
+
+    pygame.display.flip()
+    clock.tick(60)

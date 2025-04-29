@@ -6,9 +6,6 @@ from enemy import Enemy
 from utils import *
 
 
-
-
-
 class Map(pygame.sprite.Sprite):
     def __init__(self, map_id):
         super().__init__()
@@ -73,6 +70,7 @@ class Map(pygame.sprite.Sprite):
         """
 
         self.towers.draw(get_window())
+
         self.towers.draw_range()
 
 
@@ -84,34 +82,31 @@ class Map(pygame.sprite.Sprite):
         """
 
         self.towers.draw_projectiles()
-    
 
-    def draw_tower_placement(self, tower: Tower) -> None:
+
+    def draw_tower_placement(self, selected_tower: Tower) -> None:
         """
         Draws a overlay of where a tower can be placed.
 
-        :param tower: Tower image to display.
-        :return: Returns nothing.
+        :param selected_tower: Tower image to display.
+        :return: Returns boolean, True if tower is in a valid position.
         """
 
         targets = self.track.targets
-        overlay_color = (0, 255, 0, 128)
+        valid = True
 
-        for idx in range(len(targets) - 1):
-            x1, y1 = targets[idx].xy
-            x2, y2 = targets[idx + 1].xy
-            
-            #pygame.draw.rect(get_window(), (255, 0, 0), (min(x1, x2), min(y1, y2), abs(x2 - x1) + 1, abs(y2 - y1) + 1))
-            pygame.draw.rect(get_window(), (255, 0, 0), (min(x1, x2), min(y1, y2), abs(x2 - x1) + 1, abs(y2 - y1) + 1))
-
-
-            if get_distance_from_line(targets[idx], targets[idx + 1], tower.get_pos()) <= tower.get_size():
-                overlay_color = (255, 0, 0, 128)
+        for idx in range(len(targets) - 1): # invalid if cursor is too close to track
+            if get_distance_from_line(targets[idx], targets[idx + 1], get_mouse_pos()) <= selected_tower.get_size() * 2:
+                valid = False
                 break
-
-
-        surf = tower.image
-        surf = pygame.transform.scale(surf, (32, 32))
+        
+        if valid:
+            for other_tower in self.towers: # invalid if cursor is too close to another tower
+                if other_tower.get_distance_from(get_mouse_pos()) <= selected_tower.get_size() + other_tower.get_size():
+                    valid = False
+                    break        
+        
+        surf = selected_tower.image
 
         draw_surf = pygame.Surface(surf.get_size(), pygame.SRCALPHA)
 
@@ -119,7 +114,13 @@ class Map(pygame.sprite.Sprite):
 
         rect.center = get_mouse_pos()
 
+        # set the color of the overlay
+        if valid: 
+            overlay_color = (0, 255, 0, 128)
+        else:
+            overlay_color = (255, 0, 0, 128)
 
+        # change non-transparent pixels to the overlay color
         for x in range(surf.get_width()):
             for y in range(surf.get_height()):
                 if surf.get_at((x, y)).a != 0:
@@ -127,6 +128,36 @@ class Map(pygame.sprite.Sprite):
 
 
         get_window().blit(draw_surf, rect)
+        return valid
+
+
+    def draw_sprites(self) -> None:
+        """
+        Draw all sprites.
+
+        :param selected_tower: Tower that will be placed.
+        :return: Returns nothing.
+        """
+
+        self.draw()
+        self.draw_enemies()
+        self.draw_towers()
+        self.draw_projectiles()
+    
+
+    def place_tower(self, selected_tower: Tower) -> None:
+        """
+        Places a tower when in valid location and left mouse up.
+
+        :param selected_tower: Tower to place.
+        :return: Returns nothing.
+        """
+        if not self.draw_tower_placement(selected_tower):
+            return
+        if not get_mouse_up():
+            return
+        
+        self.add_tower(Tower(get_mouse_pos(), selected_tower.get_size(), selected_tower.get_range(), selected_tower.get_damage(), selected_tower.get_atk_speed()))
 
 
     def update(self) -> None:
@@ -138,8 +169,11 @@ class Map(pygame.sprite.Sprite):
 
         # update projectiles
         for tower in self.towers:
+            tower.attack(list(self.track))
             for projectile in tower.projectiles:
                 projectile.update()
+
+
 
         # update enemies
         self.track.update()
