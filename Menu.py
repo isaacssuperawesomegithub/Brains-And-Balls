@@ -1,6 +1,5 @@
 import pygame
 import sys
-import time
 
 # Initialize Pygame
 pygame.init()
@@ -23,12 +22,15 @@ MAP1 = "MAP1"
 MAP2 = "MAP2"
 MAP3 = "MAP3"
 PAUSE = "PAUSE"
-COUNTDOWN = "COUNTDOWN"  # New state for countdown
-WAVE = "WAVE"  # New state for wave
+COUNTDOWN = "COUNTDOWN"
+WAVE = "WAVE"
 state = MENU
 previous_state = None
 just_entered_map = True
 start_clicked = False
+
+# Currency
+currency = 100  # Starting money
 
 # Load Images
 zombie_hand_img = pygame.image.load("art/zombie-hand.png").convert_alpha()
@@ -40,26 +42,64 @@ background_map1 = pygame.image.load("art/map1.png").convert_alpha()
 zombie_hand_img = pygame.transform.scale(zombie_hand_img, (screen_width // 4, screen_height // 3))
 soccer_ball_img = pygame.transform.scale(soccer_ball_img, (screen_width // 4, screen_height // 3))
 vs_img = pygame.transform.scale(vs_img, (screen_width // 8, screen_height // 6))
-background_map1 = pygame.transform.scale(background_map1, (screen_width, screen_height))  # Important!
+background_map1 = pygame.transform.scale(background_map1, (screen_width, screen_height))
 
-# Functions
+# Tower Icons
+tower_icons = [
+    {"color": (255, 0, 0), "rect": pygame.Rect(100, screen_height - 100, 60, 60), "cost": 20},
+    {"color": (0, 255, 0), "rect": pygame.Rect(200, screen_height - 100, 60, 60), "cost": 30},
+]
+
+# Dragging
+dragging_tower = False
+dragged_tower_color = None
+dragged_tower_pos = (0, 0)
+dragged_tower_cost = 0
+
+# Placed towers
+placed_towers = []
+
+# Enemies
+class Enemy:
+    def __init__(self, path):
+        self.path = path
+        self.current_point = 0
+        self.pos = list(path[0])
+        self.speed = 2
+        self.hp = 100
+
+    def move(self):
+        if self.current_point < len(self.path) - 1:
+            target = self.path[self.current_point + 1]
+            dx, dy = target[0] - self.pos[0], target[1] - self.pos[1]
+            dist = (dx ** 2 + dy ** 2) ** 0.5
+            if dist != 0:
+                dx /= dist
+                dy /= dist
+                self.pos[0] += dx * self.speed
+                self.pos[1] += dy * self.speed
+            if dist < self.speed:
+                self.current_point += 1
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, (0, 255, 255), (int(self.pos[0]), int(self.pos[1])), 15)
+
+enemy_path = [(0, 300), (300, 300), (600, 300), (900, 500), (1200, 300)]
+enemies = []
+
+# === UI Functions ===
 def draw_menu():
     screen.fill((0, 0, 0))
-
-    # Draw "Brains and Balls" at the top
     title_text = menu_font.render("Brains and Balls", True, (255, 255, 255))
     screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 30))
 
-    # Draw hand, ball, vs
     screen.blit(zombie_hand_img, (screen_width // 4 - zombie_hand_img.get_width() // 2, screen_height // 2 - zombie_hand_img.get_height() // 2))
     screen.blit(soccer_ball_img, (3 * screen_width // 4 - soccer_ball_img.get_width() // 2, screen_height // 2 - soccer_ball_img.get_height() // 2))
     screen.blit(vs_img, (screen_width // 2 - vs_img.get_width() // 2, screen_height // 2 - vs_img.get_height() // 2))
 
-    # Draw Play button
     play_text = menu_font.render("Play", True, (0, 255, 0))
     play_rect = play_text.get_rect(center=(screen_width // 2, screen_height // 2 + 200))
     screen.blit(play_text, play_rect)
-
     return play_rect
 
 def draw_map_select():
@@ -67,19 +107,17 @@ def draw_map_select():
     title = map_font.render("Choose a Map", True, (255, 255, 255))
     screen.blit(title, (screen_width // 2 - title.get_width() // 2, 100))
 
-    map1_text = map_font.render("Map 1", True, (0, 255, 0))
-    map2_text = map_font.render("Map 2", True, (0, 255, 0))
-    map3_text = map_font.render("Map 3", True, (0, 255, 0))
+    map_texts = ["Map 1", "Map 2", "Map 3"]
+    positions = [screen_width // 4, screen_width // 2, 3 * screen_width // 4]
+    rects = []
 
-    rect1 = map1_text.get_rect(center=(screen_width // 4, 300))
-    rect2 = map2_text.get_rect(center=(screen_width // 2, 300))
-    rect3 = map3_text.get_rect(center=(3 * screen_width // 4, 300))
+    for i, text in enumerate(map_texts):
+        rendered = map_font.render(text, True, (0, 255, 0))
+        rect = rendered.get_rect(center=(positions[i], 300))
+        screen.blit(rendered, rect)
+        rects.append(rect)
 
-    screen.blit(map1_text, rect1)
-    screen.blit(map2_text, rect2)
-    screen.blit(map3_text, rect3)
-
-    return rect1, rect2, rect3
+    return rects
 
 def draw_pause_button():
     pause_text = map_font.render("Pause", True, (255, 255, 255))
@@ -87,13 +125,21 @@ def draw_pause_button():
     screen.blit(pause_text, pause_rect)
     return pause_rect
 
+def draw_bottom_menu():
+    pygame.draw.rect(screen, (50, 50, 50), (0, screen_height - 100, screen_width, 100))
+    for tower in tower_icons:
+        pygame.draw.rect(screen, tower["color"], tower["rect"])
+        cost_text = map_font.render(f"${tower['cost']}", True, (255, 255, 255))
+        cost_rect = cost_text.get_rect(center=(tower["rect"].centerx, tower["rect"].top - 20))
+        screen.blit(cost_text, cost_rect)
+
 def draw_wave(wave_number):
     wave_text = map_font.render(f"Wave {wave_number}", True, (255, 255, 255))
-    screen.blit(wave_text, (screen_width // 2 - wave_text.get_width() // 2, 30))  # Display wave at top
+    screen.blit(wave_text, (screen_width // 2 - wave_text.get_width() // 2, 30))
 
-# Main Loop
+# === Main Game Loop ===
 running = True
-
+wave_number = 1
 while running:
     mouse_click = False
     mouse_pos = pygame.mouse.get_pos()
@@ -122,75 +168,97 @@ while running:
                 state = MAP3
                 just_entered_map = True
 
-    elif state == MAP1:
+    if state in [MAP1, COUNTDOWN, WAVE]:
         screen.blit(background_map1, (0, 0))
-        map1_label = map_font.render("START 0/1", True, (255, 255, 255))
-        
-        # Update label text based on click
-        if start_clicked:
-            map1_label = map_font.render("START 1/1", True, (255, 255, 255))
-
-        screen.blit(map1_label, (screen_width // 2 - map1_label.get_width() // 2, 30))
-
+        currency_text = map_font.render(f"Money: ${currency}", True, (255, 255, 0))
+        screen.blit(currency_text, (30, 30))
         pause_rect = draw_pause_button()
+        draw_bottom_menu()
 
-        if mouse_click and not just_entered_map and pause_rect.collidepoint(mouse_pos):
-            previous_state = state
-            state = PAUSE
+        # START button
+        if state == MAP1:
+            label_text = "START 1/1" if start_clicked else "START 0/1"
+            map1_label = map_font.render(label_text, True, (255, 255, 255))
+            map1_rect = map1_label.get_rect(center=(screen_width // 2, 30))
+            screen.blit(map1_label, map1_rect)
 
-        # Detect click on START label
-        if mouse_click and not start_clicked:
-            if (screen_width // 2 - map1_label.get_width() // 2 <= mouse_pos[0] <= screen_width // 2 + map1_label.get_width() // 2) and (30 <= mouse_pos[1] <= 30 + map1_label.get_height()):
+        # Handle UI interactions
+        if mouse_click:
+            if state == MAP1 and map1_rect.collidepoint(mouse_pos) and not start_clicked:
                 start_clicked = True
-                state = COUNTDOWN  # Start countdown when "START 1/1" is clicked
+                state = COUNTDOWN
+            for tower in tower_icons:
+                if tower["rect"].collidepoint(mouse_pos) and currency >= tower["cost"]:
+                    dragging_tower = True
+                    dragged_tower_color = tower["color"]
+                    dragged_tower_cost = tower["cost"]
+            if pause_rect.collidepoint(mouse_pos):
+                previous_state = state
+                state = PAUSE
+
+        if dragging_tower and not pygame.mouse.get_pressed()[0]:
+            if mouse_pos[1] < screen_height - 100:
+                placed_towers.append({"color": dragged_tower_color, "pos": mouse_pos, "cooldown": 0, "range": 150, "rate": 60})
+                currency -= dragged_tower_cost
+            dragging_tower = False
+            dragged_tower_color = None
+            dragged_tower_cost = 0
+
+        for tower in placed_towers:
+            pygame.draw.circle(screen, tower["color"], tower["pos"], 20)
+
+        if dragging_tower and dragged_tower_color:
+            pygame.draw.circle(screen, dragged_tower_color, mouse_pos, 20)
+
+        # Countdown timer visual only (state COUNTDOWN does not interrupt gameplay)
+        if state == COUNTDOWN:
+            countdown = menu_font.render(str(3), True, (255, 255, 255))
+            rect = countdown.get_rect(center=(screen_width // 2, 100))
+            screen.blit(countdown, rect)
+            pygame.display.flip()
+            pygame.time.wait(3000)
+            state = WAVE
+            continue
+
+        # Enemy logic and tower firing logic
+        if state == WAVE and not enemies:
+            enemies.append(Enemy(enemy_path))
+
+        for enemy in enemies:
+            enemy.move()
+            enemy.draw(screen)
+
+        for tower in placed_towers:
+            tower["cooldown"] -= 1
+            for enemy in enemies:
+                dx = tower["pos"][0] - enemy.pos[0]
+                dy = tower["pos"][1] - enemy.pos[1]
+                dist = (dx**2 + dy**2) ** 0.5
+                if dist < tower["range"] and tower["cooldown"] <= 0:
+                    enemy.hp -= 10
+                    tower["cooldown"] = tower["rate"]
+                    pygame.draw.line(screen, (255, 0, 0), tower["pos"], enemy.pos, 2)
+                    break
+
+        enemies = [e for e in enemies if e.hp > 0]
 
         just_entered_map = False
 
-    elif state == COUNTDOWN:
-        # Display the map background
-        screen.blit(background_map1, (0, 0))
+    elif state == MAP2 or state == MAP3:
+        screen.fill((100, 0, 0))
+        label = map_font.render(f"{state} START", True, (255, 255, 255))
+        screen.blit(label, (screen_width // 2 - label.get_width() // 2, screen_height // 2))
+        pause_rect = draw_pause_button()
+        if mouse_click and pause_rect.collidepoint(mouse_pos):
+            previous_state = state
+            state = PAUSE
+        just_entered_map = False
 
-        # Countdown from 3
-        countdown_text_3 = menu_font.render("3", True, (255, 255, 255))
-        countdown_rect_3 = countdown_text_3.get_rect(center=(screen_width // 2, 50))  # Position at top center
-        screen.blit(countdown_text_3, countdown_rect_3)
-        pygame.display.flip()
-        pygame.time.wait(1000)  # Wait for 1 second
-
-        # Display number 2
-        countdown_text_2 = menu_font.render("2", True, (255, 255, 255))
-        countdown_rect_2 = countdown_text_2.get_rect(center=(screen_width // 2, 50))  # Position at top center
-        screen.blit(countdown_text_2, countdown_rect_2)
-        pygame.display.flip()
-        pygame.time.wait(1000)  # Wait for 1 second
-
-        # Display number 1
-        countdown_text_1 = menu_font.render("1", True, (255, 255, 255))
-        countdown_rect_1 = countdown_text_1.get_rect(center=(screen_width // 2, 50))  # Position at top center
-        screen.blit(countdown_text_1, countdown_rect_1)
-        pygame.display.flip()
-        pygame.time.wait(1000)  # Wait for 1 second
-
-        # After countdown finishes, show Wave 1
-        draw_wave(1)
-        pygame.display.flip()
-        pygame.time.wait(1000)  # Wait for a second before transitioning to wave
-
-        state = WAVE  # Once countdown is finished, move to wave display
-
-    elif state == WAVE:
-        # Keep the background visible
-        screen.blit(background_map1, (0, 0))
-
-        # Draw Wave 1 text
-        draw_wave(1)
-    
     elif state == PAUSE:
         screen.fill((20, 20, 20))
         paused_label = menu_font.render("PAUSED", True, (0, 255, 0))
         screen.blit(paused_label, (screen_width // 2 - paused_label.get_width() // 2, 100))
 
-        # Resume and Quit buttons
         resume_text = map_font.render("Resume", True, (0, 255, 0))
         resume_rect = resume_text.get_rect(center=(screen_width // 2, 300))
         screen.blit(resume_text, resume_rect)
@@ -203,9 +271,8 @@ while running:
             if resume_rect.collidepoint(mouse_pos):
                 state = previous_state
             elif quit_rect.collidepoint(mouse_pos):
-                # Reset start to "START 0/1" when quitting
                 start_clicked = False
-                state = MENU  # Go back to the main menu
+                state = MENU
 
     pygame.display.flip()
     clock.tick(60)
