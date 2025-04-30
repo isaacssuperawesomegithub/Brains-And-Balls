@@ -1,4 +1,5 @@
 import pygame
+from balance import Balance
 from math import hypot
 
 def get_mouse_pos() -> tuple[int, int]:
@@ -41,6 +42,17 @@ def get_window() -> pygame.Surface:
 
     from main import window
     return window
+
+
+def get_balance() -> Balance:
+    """
+    Gets balance from main file.
+
+    :return: Returns balance.
+    """
+
+    from main import balance
+    return balance
 
 
 def get_distance(first_pos: pygame.math.Vector2 | list[float, float], second_pos: pygame.math.Vector2| list[float, float]) -> float:
