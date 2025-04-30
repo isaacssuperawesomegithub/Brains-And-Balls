@@ -38,6 +38,7 @@ class Map(pygame.sprite.Sprite):
         :return: Returns nothing.
         """
 
+        enemy.set_pos(list(self.track.targets)[0])
         self.track.add(enemy)
 
 
@@ -49,6 +50,7 @@ class Map(pygame.sprite.Sprite):
         :return: Returns nothing.
         """
 
+        tower.set_pos(get_mouse_pos())
         self.towers.add(tower)
 
 
@@ -93,12 +95,14 @@ class Map(pygame.sprite.Sprite):
         """
 
         targets = self.track.targets
-        valid = True
+        valid = get_balance() >= selected_tower.get_cost()
 
-        for idx in range(len(targets) - 1): # invalid if cursor is too close to track
-            if get_distance_from_line(targets[idx], targets[idx + 1], get_mouse_pos()) <= selected_tower.get_size() * 2:
-                valid = False
-                break
+
+        if valid:
+            for idx in range(len(targets) - 1): # invalid if cursor is too close to track
+                if get_distance_from_line(targets[idx], targets[idx + 1], get_mouse_pos()) <= selected_tower.get_size() * 2:
+                    valid = False
+                    break
         
         if valid:
             for other_tower in self.towers: # invalid if cursor is too close to another tower
@@ -152,12 +156,19 @@ class Map(pygame.sprite.Sprite):
         :param selected_tower: Tower to place.
         :return: Returns nothing.
         """
+
+        balance = get_balance()
+
         if not self.draw_tower_placement(selected_tower):
+            return
+        if balance < selected_tower.get_cost():
             return
         if not get_mouse_up():
             return
         
-        self.add_tower(Tower(get_mouse_pos(), selected_tower.get_size(), selected_tower.get_range(), selected_tower.get_damage(), selected_tower.get_atk_speed()))
+        self.add_tower(selected_tower)
+        
+        balance -= selected_tower.get_cost()
 
 
     def update(self) -> None:
