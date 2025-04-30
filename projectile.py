@@ -7,8 +7,8 @@ class Projectile(pygame.sprite.Sprite):
 
         self.pos = pos
 
-        self.image = pygame.surface.Surface((5, 5))
-        self.image.fill((255,100,100))
+        self.image = pygame.image.load("./art/soccer-ball.png")
+        self.image = pygame.transform.scale(self.image, (8, 8))
         self.rect = self.image.get_rect()
 
         self.rect.center = self.pos
