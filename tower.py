@@ -4,10 +4,10 @@ from enemy import Enemy
 from projectile import Projectile
 
 class Tower(pygame.sprite.Sprite):
-    def __init__(self, pos: pygame.Vector2, size: int, range: int, damage: int, atk_speed: float):
+    def __init__(self):
         super().__init__()
         
-        self.pos = pos
+        self.pos = pygame.Vector2(0, 0)
         
         self.image = pygame.image.load("./art/icecream-zombie.png")
         self.image = pygame.transform.scale(self.image, (32, 32))
@@ -15,14 +15,27 @@ class Tower(pygame.sprite.Sprite):
 
         self.rect.center = self.pos
 
-        self.size = size
-        self.range = range
-        self.damage = damage
+        self.size = 16
+        self.range = 100
+        self.damage = 1
+        self.cost = 10
 
         self.atk_cd = 0
-        self.atk_speed = atk_speed
+        self.atk_speed = 1
 
         self.projectiles = pygame.sprite.Group()
+
+
+    def set_pos(self, new_pos) -> None:
+        """
+        Sets the position of the tower.
+
+        :param new_pos: New position.
+        :return: Returns nothing.
+        """
+
+        self.pos = new_pos
+        self.rect.center = self.pos
 
 
     def get_pos(self) -> pygame.Vector2:
@@ -64,6 +77,16 @@ class Tower(pygame.sprite.Sprite):
 
         return self.damage
     
+
+    def get_cost(self) -> int:
+        """
+        Gets the cost of the tower.
+
+        :return: An int representing the tower's cost.
+        """
+
+        return self.cost
+
 
     def get_atk_speed(self) -> float:
         """
@@ -142,3 +165,48 @@ class Tower(pygame.sprite.Sprite):
         """
 
         return Projectile(target, self.get_damage(), pygame.Vector2(self.get_pos()))
+
+class Tower1(Tower):
+    def __init__(self):
+        super().__init__()
+
+        self.image = pygame.image.load("./art/base-zombie.png")
+        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.rect = self.image.get_rect()
+
+        self.size = 16
+        self.range = 80
+        self.damage = 2
+        self.cost = 10
+
+        self.atk_speed = .5
+
+class Tower2(Tower):
+    def __init__(self):
+        super().__init__()
+
+        self.image = pygame.image.load("./art/bloody-zombie.png")
+        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.rect = self.image.get_rect()
+
+        self.size = 16
+        self.range = 150
+        self.damage = 5
+        self.cost = 35
+
+        self.atk_speed = 3
+
+class Tower3(Tower):
+    def __init__(self):
+        super().__init__()
+
+        self.image = pygame.image.load("./art/icecream-zombie.png")
+        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.rect = self.image.get_rect()
+
+        self.size = 16
+        self.range = 100
+        self.damage = 1
+        self.cost = 20
+
+        self.atk_speed = .2
