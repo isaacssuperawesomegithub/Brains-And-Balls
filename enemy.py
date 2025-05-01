@@ -4,29 +4,42 @@ Class for the base of enemies. Should be `super()`ed and then have additional mo
 
 import pygame
 from pygame.locals import *
+from utils import *
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos: pygame.math.Vector2, speed: float):
+    def __init__(self):
         super().__init__()
         
         # Stuff to draw the sprite to the screen
 
-        self.pos = pos
+        self.pos = pygame.Vector2(0, 0)
 
         self.image = pygame.image.load("./art/base-zombie.png")
+        self.image = pygame.transform.scale(self.image, (32, 32))
         self.rect = self.image.get_rect()
 
         self.rect.center = self.pos
 
         # Enemy movement
 
-        self.speed = speed
+        self.speed = 2
         self.target = None
 
         # Enemy Stats
 
         self.hp = 10
         self.value = 10
+
+    
+    def set_pos(self, new_pos: pygame.Vector2):
+        """
+        Sets the position of the enemy.
+
+        :param new_pos: New position.
+        :return: Returns nothing.
+        """
+        self.pos = new_pos
+        self.rect.center = self.pos
 
 
     def update(self, new_target: pygame.math.Vector2 | None):
@@ -58,7 +71,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.center = self.pos # updates the sprites position
 
 
-    def die(self, points: int) -> None:
+    def die(self) -> None:
         """
         A function to check if the enemy needs to die or not. If yes, `kill`s the sprite and increases points.
 
@@ -67,7 +80,8 @@ class Enemy(pygame.sprite.Sprite):
         """
 
         if self.hp <= 0:
-            points += self.value
+            balance = get_balance()
+            balance += self.value
             self.kill()
 
 
@@ -98,3 +112,42 @@ class Enemy(pygame.sprite.Sprite):
         """
 
         self.hp -= amount
+
+class Enemy1(Enemy):
+    def __init__(self):
+        super().__init__()
+        
+        self.image = pygame.image.load("./art/white-soccer.png")
+        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.rect = self.image.get_rect()
+
+        self.speed = 2
+
+        self.hp = 10
+        self.value = 15
+
+class Enemy2(Enemy):
+    def __init__(self):
+        super().__init__()
+        
+        self.image = pygame.image.load("./art/red-soccer.png")
+        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.rect = self.image.get_rect()
+
+        self.speed = 4
+
+        self.hp = 5
+        self.value = 10
+
+class Enemy3(Enemy):
+    def __init__(self):
+        super().__init__()
+        
+        self.image = pygame.image.load("./art/#10-soccer-player.png")
+        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.rect = self.image.get_rect()
+
+        self.speed = .5
+
+        self.hp = 50
+        self.value = 25

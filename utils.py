@@ -1,14 +1,21 @@
 import pygame
+from balance import Balance
 from math import hypot
 
 def get_mouse_pos() -> tuple[int, int]:
     """
-    Get the position of the mouse cursor.
+    Get the position of the mouse cursor (relative to the display window).
 
     :return: Returns a tuple coordinate of the cursor position.    
     """
 
-    return pygame.mouse.get_pos()
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+
+    display_w, display_h = pygame.display.get_surface().get_size()
+
+    window_w, window_h = get_window().get_size()
+
+    return mouse_x * (window_w / display_w), mouse_y * (window_h / display_h)
 
 
 def get_mouse_up() -> bool:
@@ -28,12 +35,24 @@ def get_mouse_up() -> bool:
 
 def get_window() -> pygame.Surface:
     """
-    Gets the current display window.
+    Gets the unscaled window (to blit onto).
 
     :return: Returns the surface of the display window.
     """
 
-    return pygame.display.get_surface()
+    from main import window
+    return window
+
+
+def get_balance() -> Balance:
+    """
+    Gets balance from main file.
+
+    :return: Returns balance.
+    """
+
+    from main import balance
+    return balance
 
 
 def get_distance(first_pos: pygame.math.Vector2 | list[float, float], second_pos: pygame.math.Vector2| list[float, float]) -> float:

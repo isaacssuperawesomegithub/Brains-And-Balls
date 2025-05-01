@@ -26,4 +26,4 @@ class Track(pygame.sprite.Group):
             else: # once the enemy reaches its target, assign it a new one
                 enemy.update(self.targets[list(self.targets).index(enemy.target) + 1].copy())
 
-            enemy.die(1)
+            enemy.die()
