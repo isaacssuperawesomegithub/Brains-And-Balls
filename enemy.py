@@ -83,6 +83,7 @@ class Enemy(pygame.sprite.Sprite):
             balance = get_balance()
             balance += self.value
             self.kill()
+            del self # Delete object instance to reduce memory usage
 
 
     def attack(self) -> None:
