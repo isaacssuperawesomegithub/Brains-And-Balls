@@ -55,7 +55,8 @@ def main():
         if event.type == KEYDOWN and 51 >= event.key >= 49:
             selected_tower = towers[event.key - 49]
     
-    window.blit(font.render(str(balance), False, (230, 230, 230)), (10, 10))
+    window.blit(font.render(str(get_balance()), False, (230, 230, 230)), (10, 10))
+    window.blit(font.render(str(get_health()), False, (230, 230, 230)), (10, 40))
 
 
 
