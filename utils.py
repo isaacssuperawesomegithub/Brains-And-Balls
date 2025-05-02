@@ -1,5 +1,6 @@
 import pygame
 from balance import Balance
+from health import Health
 from math import hypot
 
 def get_mouse_pos() -> tuple[int, int]:
@@ -46,13 +47,22 @@ def get_window() -> pygame.Surface:
 
 def get_balance() -> Balance:
     """
-    Gets balance from main file.
+    Gets most recently defined instance of balance.
 
     :return: Returns balance.
     """
 
-    from main import balance
-    return balance
+    return Balance.instance
+
+
+def get_health() -> Health:
+    """
+    Gets most recently defined instance of health.
+
+    :return Returns health.
+    """
+
+    return Health.instance
 
 
 def get_distance(first_pos: pygame.math.Vector2 | list[float, float], second_pos: pygame.math.Vector2| list[float, float]) -> float:
