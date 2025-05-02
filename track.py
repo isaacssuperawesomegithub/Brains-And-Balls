@@ -14,7 +14,6 @@ class Track(pygame.sprite.Group):
         :return: Returns nothing.
         """
         
-        
         for enemy in self:
             
             if not enemy.target: # set the enemy's target to the first target on the list
@@ -26,4 +25,4 @@ class Track(pygame.sprite.Group):
             else: # once the enemy reaches its target, assign it a new one
                 enemy.update(self.targets[list(self.targets).index(enemy.target) + 1].copy())
 
-            enemy.die()
+            enemy.die(self.targets[-1])
