@@ -15,7 +15,7 @@ class Map(pygame.sprite.Sprite):
         match map_id: 
             case 0:
                 self.image = pygame.image.load("./art/map1.png")
-                self.track = Track([pygame.Vector2(-16, 210), pygame.Vector2(100, 210), pygame.Vector2(100, 95), pygame.Vector2(220, 95), pygame.Vector2(220, 255), pygame.Vector2(380, 255), pygame.Vector2(380, 175), pygame.Vector2(700, 175)])
+                self.track = Track([pygame.Vector2(-16, 210), pygame.Vector2(100, 210), pygame.Vector2(100, 95), pygame.Vector2(220, 95), pygame.Vector2(220, 255), pygame.Vector2(380, 255), pygame.Vector2(380, 175), pygame.Vector2(616, 175)])
             case 1:
                 raise TypeError("Map doesn't exist.")
                 self.image = pygame.image.load("./art/")
@@ -159,11 +159,14 @@ class Map(pygame.sprite.Sprite):
 
         balance = get_balance()
 
+        # check if valid placement
         if not self.draw_tower_placement(selected_tower):
             return
-        if balance < selected_tower.get_cost():
-            return
+        # check if left mouse button clicked
         if not get_mouse_up():
+            return
+        # check if balance is high enough
+        if balance < selected_tower.get_cost():
             return
         
         self.add_tower(selected_tower)
