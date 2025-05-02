@@ -35,12 +35,14 @@ time = 0
 map = Map(0)
 
 balance = Balance(100)
+health = Health(100)
 
 font = pygame.Font(size=30)
 
-b1 = Button((35, 35), (650,50), (182, 200, 1), pygame.image.load(r"art/base-zombie.png"))
-b2 = Button((35, 35), (650,125), (182, 200, 1), pygame.image.load(r"art/icecream-zombie.png"))
-b3 = Button((35, 35), (650,200), (182, 200, 1), pygame.image.load(r"art/bloody-zombie.png"))
+b1 = Button((35, 35), (650,50), (182, 200, 1), pygame.image.load(r"art/base-zombie.png"), lambda tower: (set_selected_tower(tower)))
+b2 = Button((35, 35), (650,125), (182, 200, 1), pygame.image.load(r"art/icecream-zombie.png"), lambda tower: (set_selected_tower(tower)))
+b3 = Button((35, 35), (650,200), (182, 200, 1), pygame.image.load(r"art/bloody-zombie.png"), lambda tower: (set_selected_tower(tower)))
+
 towers = [Tower1, Tower2, Tower3]
 selected_tower = Tower1
 
@@ -57,7 +59,12 @@ def main():
     
     window.blit(font.render(str(get_balance()), False, (230, 230, 230)), (10, 10))
     window.blit(font.render(str(get_health()), False, (230, 230, 230)), (10, 40))
+    
 
+
+def set_selected_tower(tower):
+    global selected_tower
+    selected_tower = tower
 
 
 clock = pygame.time.Clock()
@@ -79,13 +86,11 @@ while running:
     # scale the unscaled window and blit to scaled window
     display_window.blit(pygame.transform.scale(window, display_window.get_size()), (0, 0))
     
-    if b1.is_clicked():
-        selected_tower = Tower1
-    if b2.is_clicked():
-        selected_tower = Tower2
-    if b3.is_clicked():
-        selected_tower = Tower3
+    b1.update(Tower1)
+    b2.update(Tower2)
+    b2.update(Tower3)
+
+
     pygame.display.flip()
-   
     clock.tick(60)
     time += 1
