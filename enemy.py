@@ -71,11 +71,15 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.center = self.pos # updates the sprites position
 
 
-    def die(self) -> None:
-        """
-        A function to check if the enemy needs to die or not. If yes, `kill`s the sprite and increases points.
+    def at_end(self, final_target: pygame.math.Vector2) -> bool:
+        return self.get_pos() == final_target
 
-        :param points: The number of points the player has.
+
+    def die(self, final_target: pygame.Vector2) -> None:
+        """
+        A function to check if the enemy needs to die or not. If yes, `kill`s the sprite and increases points or decreases health.
+
+        :param final_target: Final target of the map to determine when the enemy has reached the end.
         :return: Returns nothing.
         """
 
@@ -83,7 +87,14 @@ class Enemy(pygame.sprite.Sprite):
             balance = get_balance()
             balance += self.value
             self.kill()
-            del self # Delete object instance to reduce memory usage
+            del self
+            return
+        
+        if self.at_end(final_target):
+            health = get_health()
+            health -= 1
+            self.kill()
+            del self
 
 
     def attack(self) -> None:
