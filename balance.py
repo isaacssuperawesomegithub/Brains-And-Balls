@@ -1,6 +1,7 @@
-class Balance:
+class Balance:  
     def __init__(self, starting_balance: float):
         self.balance = starting_balance
+        Balance.instance = self
 
 
     def __add__(self, other):
@@ -8,7 +9,7 @@ class Balance:
 
     def __iadd__(self, other):
         self.balance += other
-        return self.balance
+        return self
 
 
     def __sub__(self, other):
@@ -16,7 +17,11 @@ class Balance:
 
     def __isub__(self, other: float):
         self.balance -= other
-        return self.balance
+        return self
+
+
+    def __set__(self, other):
+        self.balance = other
 
 
     def __lt__(self, other: float):
