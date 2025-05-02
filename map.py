@@ -97,18 +97,26 @@ class Map(pygame.sprite.Sprite):
         targets = self.track.targets
         valid = get_balance() >= selected_tower.get_cost()
 
+        mouse_pos =  get_mouse_pos()
+        tower_size = selected_tower.get_size()
+
 
         if valid:
             for idx in range(len(targets) - 1): # invalid if cursor is too close to track
-                if get_distance_from_line(targets[idx], targets[idx + 1], get_mouse_pos()) <= selected_tower.get_size() * 2:
+                if get_distance_from_line(targets[idx], targets[idx + 1], mouse_pos) <= tower_size * 2:
                     valid = False
                     break
         
         if valid:
             for other_tower in self.towers: # invalid if cursor is too close to another tower
-                if other_tower.get_distance_from(get_mouse_pos()) <= selected_tower.get_size() + other_tower.get_size():
+                if other_tower.get_distance_from(mouse_pos) <= tower_size + other_tower.get_size():
                     valid = False
-                    break        
+                    break
+        
+        if valid:
+            if not (tower_size < mouse_pos[0] < self.image.get_width() - tower_size and tower_size < mouse_pos[1] < self.image.get_height() - tower_size):
+                valid = False
+
         
         surf = selected_tower.image
 
