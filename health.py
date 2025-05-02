@@ -9,7 +9,6 @@ class Health:
 
     def __iadd__(self, other):
         self.hp += other
-        return self
 
 
     def __sub__(self, other):
@@ -17,7 +16,6 @@ class Health:
 
     def __isub__(self, other: float):
         self.hp -= other
-        return self
 
 
     def __set__(self, other):
