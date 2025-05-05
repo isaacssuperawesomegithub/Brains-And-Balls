@@ -3,7 +3,7 @@ from balance import Balance
 from health import Health
 from math import hypot
 
-def get_mouse_pos() -> tuple[int, int]:
+def get_mouse_pos() -> pygame.Vector2:
     """
     Get the position of the mouse cursor (relative to the display window).
 
@@ -16,7 +16,7 @@ def get_mouse_pos() -> tuple[int, int]:
 
     window_w, window_h = get_window().get_size()
 
-    return mouse_x * (window_w / display_w), mouse_y * (window_h / display_h)
+    return pygame.Vector2(mouse_x * (window_w / display_w), mouse_y * (window_h / display_h))
 
 
 def get_mouse_up() -> bool:
@@ -52,8 +52,10 @@ def get_balance() -> Balance:
     :return: Returns balance.
     """
 
-    return Balance.instance
-
+    try:
+        return Balance.instance
+    except AttributeError:
+        raise TypeError("No balance object initialized.")
 
 def get_health() -> Health:
     """
@@ -62,7 +64,10 @@ def get_health() -> Health:
     :return Returns health.
     """
 
-    return Health.instance
+    try:
+        return Health.instance
+    except AttributeError:
+        raise TypeError("No health object initialized.")
 
 
 def get_distance(first_pos: pygame.math.Vector2 | list[float, float], second_pos: pygame.math.Vector2| list[float, float]) -> float:
