@@ -26,6 +26,13 @@ class Tower(pygame.sprite.Sprite):
         self.projectiles = pygame.sprite.Group()
 
 
+    def draw(self):
+        window = get_window()
+
+        pygame.draw.ellipse(window, (150, 150, 150), (self.pos[0] - self.size * .75, self.pos[1] + self.size / 2, self.size * 1.5, self.size * .8))
+        window.blit(self.image, self.rect)
+
+
     def set_pos(self, new_pos) -> None:
         """
         Sets the position of the tower.
