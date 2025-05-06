@@ -6,6 +6,11 @@ class Towers(pygame.sprite.Group):
         super().__init__()
 
 
+    def draw(self):
+        for sprite in self:
+            sprite.draw()
+
+
     # draw each tower in the list
     def draw_range(self) -> None:
         """
