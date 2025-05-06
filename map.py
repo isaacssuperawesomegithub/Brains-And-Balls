@@ -2,7 +2,8 @@ import pygame
 from towers import Towers
 from tower import Tower
 from track import Track
-from enemy import Enemy
+from wav import Wave
+from enemy import *
 from utils import *
 
 
@@ -16,14 +17,29 @@ class Map(pygame.sprite.Sprite):
             case 0:
                 self.image = pygame.image.load("./art/map1.png")
                 self.track = Track([pygame.Vector2(-16, 210), pygame.Vector2(100, 210), pygame.Vector2(100, 95), pygame.Vector2(220, 95), pygame.Vector2(220, 255), pygame.Vector2(380, 255), pygame.Vector2(380, 175), pygame.Vector2(616, 175)])
+                self.waves = [
+                    Wave(Enemy1, 5, 60, self),
+                    Wave(Enemy2, 5, 20, self),
+                    Wave(Enemy3, 3, 120, self)
+                ]
+
             case 1:
-                raise TypeError("Map doesn't exist.")
-                self.image = pygame.image.load("./art/")
-                self.track = Track([])
+                self.image = pygame.image.load("./art/map2.png")
+                self.track = Track([pygame.Vector2(-16, 45), pygame.Vector2(265, 45), pygame.Vector2(265, 370), pygame.Vector2(616, 370)])
+                self.waves = [
+                    Wave(Enemy1, 5, 60, self),
+                    Wave(Enemy2, 5, 20, self),
+                    Wave(Enemy3, 3, 120, self)
+                ]
+                
             case 2:
                 raise TypeError("Map doesn't exist.")
                 self.image = pygame.image.load("./art/")
                 self.track = Track([])
+
+        self.image = pygame.transform.scale(self.image, (600, 400))
+
+        self.current_wave = 0
 
         self.rect = self.image.get_rect()
 
@@ -38,7 +54,7 @@ class Map(pygame.sprite.Sprite):
         :return: Returns nothing.
         """
 
-        enemy.set_pos(list(self.track.targets)[0])
+        enemy.set_pos(list(self.track.targets)[0]) # sets enemy start position
         self.track.add(enemy)
 
 
@@ -71,7 +87,7 @@ class Map(pygame.sprite.Sprite):
         :return: Returns nothing.
         """
 
-        self.towers.draw(get_window())
+        self.towers.draw()
 
         self.towers.draw_range()
 
@@ -188,6 +204,11 @@ class Map(pygame.sprite.Sprite):
         
         :return: Returns nothing.
         """
+        
+        # win if last wave cleared
+        if self.current_wave == len(self.waves) and len(self.track) == 0:
+            print("You win!")
+            return
 
         # update projectiles
         for tower in self.towers:
@@ -196,11 +217,15 @@ class Map(pygame.sprite.Sprite):
                 projectile.update()
 
 
+        # add enemies from wave
+        if len(self.waves) > self.current_wave:
+            self.waves[self.current_wave].update()
+
 
         # update enemies
         self.track.update()
 
-
+        
     def draw(self) -> None:
         """
         Draws the map sprite.
