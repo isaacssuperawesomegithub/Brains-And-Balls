@@ -34,6 +34,20 @@ class Towers(pygame.sprite.Group):
             window.blit(surf, (tower_pos[0] - tower_range, tower_pos[1] - tower_range)) # blit the circle
             window.blit(tower.image, tower.rect) # reblit the tower (so it shows in front of the circle)
 
+
+            # stop if tower is at max tier
+            if tower.tier >= 4:
+                return
+
+
+            # draws the cost of the upgrade
+            if get_balance().balance < tower.get_upgrade_cost():
+                draw_text("$" + str(tower.get_upgrade_cost()), tower.pos + (0, 35), None, 40, (200, 140, 120))
+            else:
+                draw_text("$" + str(tower.get_upgrade_cost()), tower.pos + (0, 35), None, 40, (100, 240, 120))
+
+            draw_text("Upgrade: ", tower.pos + (0, 25), None, 40, (200, 200, 40))
+
     
     def draw_projectiles(self) -> None:
         """
