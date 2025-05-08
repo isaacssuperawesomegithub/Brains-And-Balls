@@ -18,7 +18,11 @@ class Tower(pygame.sprite.Sprite):
         self.size = 16
         self.range = 100
         self.damage = 1
+
         self.cost = 10
+        self.upgrade_cost = 10
+
+        self.tier = 0
 
         self.atk_cd = 0
         self.atk_speed = 1
@@ -29,7 +33,7 @@ class Tower(pygame.sprite.Sprite):
     def draw(self):
         window = get_window()
 
-        pygame.draw.ellipse(window, (150, 150, 150), (self.pos[0] - self.size * .75, self.pos[1] + self.size / 2, self.size * 1.5, self.size * .8))
+        pygame.draw.ellipse(window, [(150, 150, 150), (40, 100, 240), (120, 240, 40), (220, 60, 80), (240, 240, 40)][self.tier], (self.pos[0] - self.size * .75, self.pos[1] + self.size / 2, self.size * 1.5, self.size * .8))
         window.blit(self.image, self.rect)
 
 
@@ -89,10 +93,20 @@ class Tower(pygame.sprite.Sprite):
         """
         Gets the cost of the tower.
 
-        :return: An int representing the tower's cost.
+        :return: Returns an int representing the tower's cost.
         """
 
         return self.cost
+
+
+    def get_upgrade_cost(self):
+        """
+        Gets the cost to upgrade the tower.
+
+        :return: Returns an int representing the tower's cost to upgrade.
+        """
+
+        return self.upgrade_cost
 
 
     def get_atk_speed(self) -> float:
@@ -172,6 +186,21 @@ class Tower(pygame.sprite.Sprite):
         """
 
         return Projectile(target, self.get_damage(), pygame.Vector2(self.get_pos()))
+    
+
+    def upgrade(self) -> None:
+        balance = get_balance()
+        
+        if balance < self.get_upgrade_cost() or self.tier >= 4:
+            return
+        
+        balance -= self.get_upgrade_cost()
+
+        self.damage = int(self.damage * 1.5)
+        self.upgrade_cost = int(self.upgrade_cost * 1.8)
+
+        self.tier += 1
+
 
 class Tower1(Tower):
     def __init__(self):
@@ -184,7 +213,9 @@ class Tower1(Tower):
         self.size = 16
         self.range = 80
         self.damage = 2
+
         self.cost = 10
+        self.upgrade_cost = 20
 
         self.atk_speed = .5
 
@@ -199,7 +230,9 @@ class Tower2(Tower):
         self.size = 16
         self.range = 150
         self.damage = 5
+        
         self.cost = 35
+        self.upgrade_cost = 45
 
         self.atk_speed = 3
 
@@ -214,6 +247,8 @@ class Tower3(Tower):
         self.size = 16
         self.range = 100
         self.damage = 1
+
         self.cost = 20
+        self.upgrade_cost = 35
 
         self.atk_speed = .2
