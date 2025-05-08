@@ -42,4 +42,4 @@ class Balance:
 
 
     def __str__(self) -> str:
-        return "Balance: $" + str(self.balance)
+        return f"Balance: ${self.balance:,}"

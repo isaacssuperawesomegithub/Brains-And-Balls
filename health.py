@@ -40,4 +40,4 @@ class Health:
 
 
     def __str__(self) -> str:
-        return "Health: " + str(self.hp)
+        return f"Health: {self.hp:,}"
