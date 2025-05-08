@@ -38,11 +38,86 @@ def get_window() -> pygame.Surface:
     """
     Gets the unscaled window (to blit onto).
 
-    :return: Returns the surface of the display window.
+    :return: Returns the surface of the usncaled window.
     """
 
     from main import window
     return window
+
+
+def get_fullscreen() -> pygame.Surface:
+    """
+    Gets the scaled window. Useful for maintaining quality of things like text.
+
+    :return: Returns the surface of the scaled window.
+    """
+
+    return pygame.display.get_surface()
+
+
+def get_scale() -> tuple[int, int]:
+    """
+    Gets the scale of the unscaled window to the scaled window.
+
+    :return: Returns a tuple of the scale for the width and height.
+    """
+
+    return get_fullscreen().width / get_window().width, get_fullscreen().height / get_window().height
+
+
+def scale_pos(to_scale: pygame.Vector2 | tuple | pygame.Rect) -> pygame.Vector2 | tuple | pygame.Rect:
+    """
+    Gets the scaled position or Rect from a unscaled position or Rect.
+
+    :param to_scale: Coordinate or Rect to scale.
+    :return: Returns a vector, tuple, or Rect depending on type of argument.
+    """
+    
+    x_scale, y_scale = get_scale()
+    
+    if type(to_scale) == pygame.Rect:
+        rect = pygame.Rect(to_scale.x * x_scale, to_scale.y * y_scale, to_scale.width, to_scale.height)
+        x, y = to_scale.center
+        rect.center = x * x_scale, y * y_scale
+        return rect
+    
+    return type(to_scale)((to_scale[0] * x_scale, to_scale[1] * y_scale))
+
+
+def draw_text(text: str, pos: tuple[int, int], font: str=None, size:int =20, color: tuple[int, int, int]=(255, 255, 255), alignment: str="center") -> None:
+    """
+    Draws text on display screen, scales with screen size.
+
+    :param text: Text to draw.
+    :param pos: Position of text.
+    :param font: Font to use.
+    :param size: Size of text.
+    :param color: Color of text.
+    :param: alignment: Alignment of text.
+
+    :return: Returns nothing.
+    """
+
+    font = pygame.Font(font, round(size * (get_fullscreen().get_height() / 1000)))
+
+    text = font.render(text, True, color)
+    text_rect = text.get_rect()
+    match alignment:
+        case "center":
+            text_rect.center = scale_pos(pos)
+        case "midleft":
+            text_rect.midleft = scale_pos(pos)
+        case "midright":
+            text_rect.midright = scale_pos(pos)
+        case "topleft":
+            text_rect.topleft = scale_pos(pos)
+        case "topright":
+            text_rect.topright = scale_pos(pos)
+
+        case _:
+            raise(TypeError("Not a valid alignment."))
+
+    get_fullscreen().blit(text, text_rect)
 
 
 def get_balance() -> Balance:
