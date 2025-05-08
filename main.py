@@ -27,23 +27,25 @@ display_window = pygame.display.set_mode((display_info.current_w, display_info.c
 surf = pygame.surface.Surface((100,400))
 surf.fill((188, 91, 19))
 rect = surf.get_rect()
-rect.topleft = (600,0)
+rect.topleft = (540,0)
 
 map = Map(0)
 
-balance = Balance(100)
+balance = Balance(100000)
 health = Health(100)
 
-font = pygame.Font(size=30)
-
-b1 = Button((35, 35), (620,20), (182, 200, 1), pygame.image.load(r"art/base-zombie.png"), lambda tower: (set_selected_tower(tower)))
-b2 = Button((35, 35), (620,60), (182, 200, 1), pygame.image.load(r"art/bloody-zombie.png"), lambda tower: (set_selected_tower(tower)))
-b3 = Button((35, 35), (620,100), (182, 200, 1), pygame.image.load(r"art/icecream-zombie.png"), lambda tower: (set_selected_tower(tower)))
+b1 = Button((35, 35), (560,20), (182, 200, 1), pygame.image.load(r"art/base-zombie.png"), lambda tower: (set_selected_tower(tower)))
+b2 = Button((35, 35), (560,60), (182, 200, 1), pygame.image.load(r"art/bloody-zombie.png"), lambda tower: (set_selected_tower(tower)))
+b3 = Button((35, 35), (560,100), (182, 200, 1), pygame.image.load(r"art/icecream-zombie.png"), lambda tower: (set_selected_tower(tower)))
 
 towers = [Tower1, Tower2, Tower3]
 selected_tower = Tower1
 
 def main():
+    for tower in map.towers:
+        if tower.rect.collidepoint(get_mouse_pos()) and get_mouse_up():
+            tower.upgrade()
+
     map.draw_sprites()
     map.update()
     map.place_tower(selected_tower())
@@ -52,8 +54,9 @@ def main():
         if event.type == KEYDOWN and 51 >= event.key >= 49:
             set_selected_tower(towers[event.key - 49])
     
-    window.blit(font.render(str(get_balance()), False, (230, 230, 230)), (10, 10))
-    window.blit(font.render(str(get_health()), False, (230, 230, 230)), (10, 40))
+
+    draw_text(str(get_balance()), (10, 10), None, 80, (230, 230, 230), "topleft")
+    draw_text(str(get_health()), (10, 35), None, 80, (230, 230, 230), "topleft")
 
 
 def set_selected_tower(tower):
@@ -71,6 +74,9 @@ while running:
         if event.type == QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             quit()
     
+    # scale the unscaled window and blit to scaled window
+    display_window.blit(pygame.transform.scale(window, display_window.get_size()), (0, 0))
+    
 
     main()
     window.blit(surf, rect)
@@ -78,9 +84,6 @@ while running:
     b2.draw_img(window)
     b3.draw_img(window)
 
-    # scale the unscaled window and blit to scaled window
-    display_window.blit(pygame.transform.scale(window, display_window.get_size()), (0, 0))
-    
     b1.update(Tower1)
     b2.update(Tower2)
     b3.update(Tower3)
