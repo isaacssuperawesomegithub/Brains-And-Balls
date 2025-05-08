@@ -16,7 +16,7 @@ class Map(pygame.sprite.Sprite):
         match map_id: 
             case 0:
                 self.image = pygame.image.load("./art/map1.png")
-                self.track = Track([pygame.Vector2(-16, 210), pygame.Vector2(100, 210), pygame.Vector2(100, 95), pygame.Vector2(220, 95), pygame.Vector2(220, 255), pygame.Vector2(380, 255), pygame.Vector2(380, 175), pygame.Vector2(616, 175)])
+                self.track = Track([pygame.Vector2(-16, 190), pygame.Vector2(90, 190), pygame.Vector2(90, 80), pygame.Vector2(198, 80), pygame.Vector2(198, 225), pygame.Vector2(343, 225), pygame.Vector2(343, 155), pygame.Vector2(556, 155)])
                 self.waves = [
                     Wave(Enemy1, 5, 60, self),
                     Wave(Enemy2, 5, 20, self),
@@ -37,7 +37,7 @@ class Map(pygame.sprite.Sprite):
                 self.image = pygame.image.load("./art/")
                 self.track = Track([])
 
-        self.image = pygame.transform.scale(self.image, (600, 400))
+        self.image = pygame.transform.scale(self.image, (540, 360))
 
         self.current_wave = 0
 
@@ -206,7 +206,7 @@ class Map(pygame.sprite.Sprite):
         """
         
         # win if last wave cleared
-        if self.current_wave == len(self.waves) and len(self.track) == 0:
+        if self.current_wave == len(self.waves) and len(self.track) == 0 and get_health() > 0:
             print("You win!")
             return
 
